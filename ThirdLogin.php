@@ -15,7 +15,7 @@ class UserOauth
 {
        	const COLLNAME = 'useroauth'; //数据集名
 		
-		/********各平台的AppSecret和AppID********/
+		//各平台的AppSecret和AppID
        	const weiboAKey = '';//sina
        	const weiboSKey = '';
 
@@ -27,9 +27,8 @@ class UserOauth
 
        	const doubanAKey = '';//douban
        	const doubanSKey = '';
-		/**************************************************/
 		
-		/******************回调地址***********************/
+		//回调地址
        	const defaulturl = '';
 
 
