@@ -4,7 +4,6 @@
  *   Author        ：wangyulu
  *   Date          ：2016/11/25 17:11:18
  *   Version       ：1.0
- *   Copyright (C) pianke 2016 All rights reserved.
  *
  *   FileName      ：ThirdLogin.php
  */
