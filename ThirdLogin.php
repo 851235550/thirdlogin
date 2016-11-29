@@ -4,6 +4,7 @@
  *   Author        ：wangyulu
  *   Date          ：2016/11/25 17:11:18
  *   Version       ：1.0
+ *   Copyright (C) pianke 2016 All rights reserved.
  *
  *   FileName      ：ThirdLogin.php
  */
@@ -12,10 +13,9 @@ require_once(dirname(__FILE__).'/sdk/qq/qqAuth.class.php');
 require_once(dirname(__FILE__).'/sdk/douban/DoubanOAuth.php');
 class UserOauth
 {
-
 	const COLLNAME = 'useroauth'; //数据集名
 
-	//各平台的AppSecret和AppID
+	/********各平台的AppSecret和AppID********/
 	const weiboAKey = '';//sina
 	const weiboSKey = '';
 
@@ -27,8 +27,9 @@ class UserOauth
 
 	const doubanAKey = '';//douban
 	const doubanSKey = '';
+	/**************************************************/
 
-	//回调地址
+	/******************回调地址***********************/
 	const defaulturl = '';
 
 
@@ -79,7 +80,7 @@ class UserOauth
 			$token['expires_time'] = time() + intval($token['expires_in']) - 100;
 			$ret = array(
 				'ouid'=>$userInfo['idstr'],
-				'source'=>1,//sina
+				'source'=>'sina',//sina
 				'uname'=>$userInfo['screen_name'],
 				'gender'=>$userInfo['gender'] == 'f' ? 2 : 1,
 				'desc'=>$userInfo['description'],
@@ -126,7 +127,7 @@ class UserOauth
 
 			$ret = array(
 				'ouid'=>$open->openid,
-				'source'=>2,//weixin
+				'source'=>'qq',
 				'uname'=>$userInfo['nickname'],
 				'gender'=>$userInfo['gender'] == '男' ? 2 : 1,
 				'desc'=>$userInfo['msg'],
@@ -165,7 +166,7 @@ class UserOauth
 		if(!empty($userInfo['openid'])){
 			$ret = array(
 				'ouid'=>$userInfo['openid'],
-				'source'=>5,//wx
+				'source'=>'wx',//wx
 				'uname'=>$userInfo['nickname'],
 				'gender'=>$userInfo['sex'] == 1 ? 2 : 1,
 				'desc'=>'',
@@ -195,20 +196,40 @@ class UserOauth
 	 */
 	public static function doubanLogin($url='')
 	{
-		if(empty($url)){
-			$url = self::defaulturl;
-		}
-		$clientId = self::doubanAKey;
-		$doubanSKey = self::doubanSKey;
-		$config['key'] = $clientId;
-		$config['secret'] = $doubanSKey;
-		$config['redirect_url'] = $url.'/oauth/douban/callback.php';
+		$config = array(
+			'key' => self::doubanAKey,
+			'secret' => self::doubanSKey,
+			'redirect_url' => empty($url) ? self::defaulturl : $url,
+		);
 		$doubansdk = new DoubanOAuth($config);
 
 		$retUrl = $doubansdk->getAuthorizeURL();
 		return  $retUrl;
 	}
+	
+	public static function doubanCallback($code,$url='')
+	{
+		$config = array(
+			'key' => self::doubanAKey,
+			'secret' => self::doubanSKey,
+			'redirect_url' => empty($url) ? self::defaulturl : $url,	
+		);
+		$doubansdk = new DoubanOAuth($config);
+		if($token){
+			$userInfo = $doubansdk->get('user/~me');
+			$ret = array(
+				'ouid' => $userInfo['loc_id'],
+				'source' => 'douban',
+				'uname' => $userInfo['name'],
+				'gender' => 1,
+				'desc' => $userInfo['signature'],
+				'icon' => $userInfo['large_avatar'],
+				'accessToken' => $token,	
+			);
 
+			return $ret;
+		}
+	}
 
 	/**
 	 * http 请求 支持https，支持post，get
